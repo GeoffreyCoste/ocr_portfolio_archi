@@ -63,7 +63,6 @@ const createFilterMenu = (works) => {
     
     const btnFilters = [btnFilterAll, ...btnFilterCategoriesNodes];
     handleFilters(btnFilters, works);
-    console.log(btnFilters);
 }
 
 const createCategoryFilterBtn = (name) => {
@@ -76,7 +75,6 @@ const createCategoryFilterBtn = (name) => {
 
 /* Filtering works displayed in gallery */
 const handleFilters = (btnFiltersArr, works) => {
-    console.log(works);
     btnFiltersArr.forEach(btn => {
         btn.addEventListener('click', (event) => {
             toggleActive(event);
@@ -86,10 +84,8 @@ const handleFilters = (btnFiltersArr, works) => {
 
     const filterWorks = (event, works) => {
         let btnFilter = event.target;
-        console.log(works);
         if (btnFilter.dataset.name !== 'tous') {
             const filteredWorks = works.filter(work => work.category.name.toLowerCase() === btnFilter.dataset.name);
-            console.log(filteredWorks);
             return displayWorks(filteredWorks);
         } else {
             return displayWorks(works);
