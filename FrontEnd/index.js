@@ -7,13 +7,13 @@ const fetchWorksData = async () => {
     try {
         const response = await fetch('http://localhost:5678/api/works');
         works = await response.json();
-        if(!Array.isArray(works)) {
-            works = [works];
-        }
         displayWorks(works);
         createFilterMenu(works);
     } catch (e) {
-        console.log(e);
+        console.log(e); // Add error management: 'Un problème est survenu lors du chargement'
+        const error = document.createElement('p');
+        error.innerText = 'Un problème est survenu lors du chargement';
+        gallery.append(error);
     }
 }
 
@@ -22,7 +22,6 @@ const displayWorks = (works) => {
     const worksNodes = works.map((work) => {
         return createWorkElement(work);
     });
-    gallery.innerHTML = "";
     gallery.append(...worksNodes);
 };
 
@@ -34,7 +33,6 @@ const createWorkElement = (work) => {
     `;
     return figure;
 };
-
 
 /* Creation of filter menu and buttons inside */
 const createFilterMenu = (works) => {
@@ -107,3 +105,4 @@ const handleFilters = (btnFiltersArr, works) => {
 };
 
 fetchWorksData();
+
