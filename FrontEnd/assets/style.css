@@ -158,6 +158,32 @@ li:hover {
 	text-align: center;
 	margin-bottom: 1em;
 }
+
+.filters {
+	width: 100%;
+	display: flex;
+	justify-content: center;
+}
+
+.filters button {
+	font-family: 'Syne';
+	font-weight: 700;
+	color: #1D6154;
+	background-color: #ffffff;
+	margin : 2em 1em;
+	padding: 0.5em 1em;
+	/* width: 180px; */
+	text-align: center;
+	border: 1px solid #1D6154;
+	border-radius: 60px;
+	cursor: pointer;
+}
+
+.filters button.active {
+	color: #ffffff;
+	background-color: #1D6154;
+}
+
 .gallery {
 	width: 100%;
 	display: grid;
@@ -226,7 +252,7 @@ input[type="submit"]{
 	margin : 2em auto ;
 	width: 180px;
 	text-align: center;
-	border-radius: 60px ;
+	border-radius: 60px;
 }
 
 footer nav ul {
