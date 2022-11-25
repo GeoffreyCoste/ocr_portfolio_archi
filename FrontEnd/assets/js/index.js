@@ -1,6 +1,7 @@
 let portfolio = document.querySelector('#portfolio');
 let gallery = document.querySelector('.gallery');
 let works;
+const isEditModeDisplayed = JSON.parse(sessionStorage.getItem("user_data")).isEditModeDisplayed;
 
 /* Getting API works data and display */
 const fetchWorksData = async () => {
@@ -9,10 +10,17 @@ const fetchWorksData = async () => {
         works = await response.json();
         displayWorks(works);
         createFilterMenu(works);
+        if (isEditModeDisplayed) {
+            removeFilterMenu();
+        };
     } catch (e) {
-        console.log(e); // Add error management: 'Un problème est survenu lors du chargement'
+        console.log(e);
         const error = document.createElement('p');
-        error.innerText = 'Un problème est survenu lors du chargement';
+        error.classList.add('error-message');
+        error.style.gridColumn = '2/3';
+        error.style.gridRow = '1/2';
+        error.innerText = 'Un problème est survenu lors du chargement.';
+        gallery.innerHTML = '';
         gallery.append(error);
     }
 }
@@ -22,6 +30,7 @@ const displayWorks = (works) => {
     const worksNodes = works.map((work) => {
         return createWorkElement(work);
     });
+    gallery.innerHTML = '';
     gallery.append(...worksNodes);
 };
 
@@ -102,6 +111,12 @@ const handleFilters = (btnFiltersArr, works) => {
             }
         });
     };
+};
+
+const removeFilterMenu = () => {
+    const filters = document.querySelector('.filters');
+    console.log(filters);
+    filters.classList.add("hidden");
 };
 
 fetchWorksData();
