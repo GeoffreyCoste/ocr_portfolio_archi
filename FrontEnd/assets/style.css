@@ -31,6 +31,10 @@ footer, header, hgroup, menu, nav, section {
 body {
 	line-height: 1;
 }
+body.no-scroll {
+	overflow: hidden;
+}
+
 ol, ul {
 	list-style: none;
 }
@@ -71,22 +75,163 @@ body {
 	margin-right: 1.313em;
 }
 
-.btn-edit-validate {
+.btn {
+    font-family: 'Syne';
+    font-weight: 700;
+    color: white;
+    background-color: #1D6154;
+    margin: 2em auto;
+    width: 180px;
+    text-align: center;
+	border: 1px solid transparent;
+    border-radius: 60px;
+	cursor: pointer;
+}
+
+.btn--no-border {
+	background-color: transparent;
+	border: none;
+}
+
+.btn--square {
+	width: 17px;
+	height: 17px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin: 0;
+	background-color: #000;
+	border-radius: 2px;
+}
+
+.btn--square i {
+	font-size: 9px;
+}
+
+.btn--filter {
+	margin : 2em 1em;
+	padding: 0.5em 1em;
+	color: #1D6154;
+	background-color: transparent;
+	border: 1px solid #1D6154;
+}
+
+.btn--filter.active {
+	color: #ffffff;
+	background-color: #1D6154;
+}
+
+.btn--edit-validate {
 	width: 216px;
 	height: 50px;
-	text-align: center;
-	font-weight: 600;
-	border-radius: 60px;
-	cursor: pointer;
+	margin: 0;
+	font-family: 'Work Sans';
+	color: #000000;
+	background-color: #ffffff;
 }
 
-.btn-edit-field {
+.btn--edit-field {
 	display: flex;
+	margin: 0;
+	padding: 0;
+	font-family: 'Work Sans';
+	font-weight: 500;
+	color: inherit;
+}
+
+.btn--edit-field i {
+	margin-right: 0.5em;
+}
+
+.btn--back,
+.btn--close {
+	width: 12px;
+	margin: 0;
+	color: #000000;
+}
+
+.btn--back {
+	opacity: 0;
+	cursor: default;
+}
+
+.btn--back.show {
+	opacity: 1;
 	cursor: pointer;
 }
 
-.btn-edit-field i {
-	margin-right: 0.5em;
+.btn--edit {
+	width: auto;
+	margin: 0;
+	padding: 0;
+	color: #000000;
+	font-family: 'Work Sans';
+	font-weight: 400;
+}
+
+.btn--add-image {
+	width: 237px;
+	height: 36px;
+	display: block;
+	margin: 2.375rem auto 0 auto;
+}
+
+.btn--delete-all {
+	display: block;
+	color: #D65353;
+	margin: 1.5rem auto 0 auto;
+}
+
+.layer {
+    width: 100vw;
+    /* height: 100vh; */
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0,0,0,0.5);
+}
+
+.modal {
+	width: 630px;;
+	background-color: #ffffff;
+	border-radius: 10px;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
+
+.modal__container {
+	display: flex;
+	flex-direction: column;
+	padding: 2rem;
+}
+
+.modal__header {
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+}
+
+.header__buttons {
+	display: flex;
+	justify-content: space-between;
+}
+
+/* .header__buttons .fa-arrow-left-long {
+	opacity: 0;
+} */
+
+.header__title {
+	font-size: 1.625rem;
+	font-weight: 500;
+	text-align: center;
+	margin: 1rem 0 2.25rem 0;
+}
+
+.modal__content {
+	padding: 0 3rem;
 }
 
 header {
@@ -146,18 +291,22 @@ li:hover {
 	width: 80%;
 }
 
-#introduction .btn-edit-field {
-	width: 80%;
-	margin: 1rem auto 0 auto;
+#introduction .btn--edit-field {
+	margin: 1rem auto 0 10%;
 }
 
-#introduction article .btn-edit-field {
+#introduction article .btn--edit-field {
 	margin: 0 ;
 }
 
 #introduction article {
 	flex: 1
 }
+
+#introduction article .btn--edit-field {
+	margin-bottom: 0.5rem;
+}
+
 #introduction h2 {
 	margin-bottom: 1em;
 }
@@ -177,7 +326,7 @@ li:hover {
 	margin-right: 1em;
 }
 
-#portfolio .btn-edit-field {
+#portfolio .btn--edit-field {
 	margin: 0.5rem 0 6rem 0;
 }
 
@@ -191,25 +340,6 @@ li:hover {
 	display: none;
 }
 
-.filters button {
-	font-family: 'Syne';
-	font-weight: 700;
-	color: #1D6154;
-	background-color: #ffffff;
-	margin : 2em 1em;
-	padding: 0.5em 1em;
-	/* width: 180px; */
-	text-align: center;
-	border: 1px solid #1D6154;
-	border-radius: 60px;
-	cursor: pointer;
-}
-
-.filters button.active {
-	color: #ffffff;
-	background-color: #1D6154;
-}
-
 .gallery {
 	width: 100%;
 	display: grid;
@@ -218,10 +348,35 @@ li:hover {
 	grid-row-gap: 20px;
 }
 
+.gallery--edit {
+	grid-template-columns: repeat(5, 1fr);
+	padding-bottom: 3rem;
+	border-bottom: 1px solid #B3B3B3;
+}
+
+.gallery--edit.hidden {
+	display: none;
+}
+
 .gallery img {
 	width: 100%;
+}
+
+.gallery--edit figure {
+	width: 78px;
+	position: relative;
+}
+
+.gallery--edit .buttons-above {
+	width: 50%;
+	display: flex;
+	justify-content: space-between;
+	position: absolute;
+	top: 5px;
+	right: 5px;
 
 }
+
 #contact,
 #login {
 	width: 50%;
