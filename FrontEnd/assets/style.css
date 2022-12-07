@@ -182,10 +182,26 @@ body {
 	margin: 1.5rem auto 0 auto;
 }
 
+.btn--select-img {
+	height: 36px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	position: relative;
+	margin: 1.313em 0 0.438em 0;
+	color: #306685;
+	font-family: 'Work Sans';
+	background-color: #CBD6DC;
+	cursor: pointer;
+}
+
 .layer {
     width: 100vw;
     /* height: 100vh; */
-    position: absolute;
+    /* position: absolute; */
+    position: fixed;
+	top: 0;
+	left: 0;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -193,16 +209,16 @@ body {
 }
 
 .modal {
-	width: 630px;;
+	width: 630px;
 	background-color: #ffffff;
 	border-radius: 10px;
-	position: absolute;
+	position: fixed;
 	top: 50%;
 	left: 50%;
 	transform: translate(-50%, -50%);
 }
 
-.modal__container {
+.modal__content {
 	display: flex;
 	flex-direction: column;
 	padding: 2rem;
@@ -230,7 +246,7 @@ body {
 	margin: 1rem 0 2.25rem 0;
 }
 
-.modal__content {
+.modal__body {
 	padding: 0 3rem;
 }
 
@@ -403,7 +419,8 @@ li:hover {
 }
 
 #contact form,
-#login form {
+#login form,
+.form--add-img {
 	text-align: left;
 	margin-top:30px;
 	display: flex;
@@ -411,12 +428,59 @@ li:hover {
 }
 
 #contact input,
-#login input {
+#login input,
+.form--add-img input,
+.form--add-img select {
 	height: 50px;
 	font-size: 1.2em;
 	border: none;
 	box-shadow: 0px 4px 14px rgba(0, 0, 0, 0.09);
 }
+
+.form--add-img.hidden {
+	display: none;
+}
+
+.form--add-img .form__input {
+	height: 169px;
+	background-color: #E8F1F6;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	position: relative;
+	padding: 28px 0 19px 0;
+	cursor: pointer;
+}
+
+.form__input i {
+	font-size: 58px;
+}
+
+.form__input .btn--select-img {
+	position: relative;
+	cursor: pointer;
+}
+
+.form__input #input__file {
+	position: absolute;
+	opacity: 0;
+	z-index: -1;
+}
+
+.form__input span {
+	font-size: 10px;
+}
+
+.form__input .file__preview {
+	width: auto;
+    height: 200px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
 #contact label,
 #login label {
 	margin: 2em 0 1em 0;

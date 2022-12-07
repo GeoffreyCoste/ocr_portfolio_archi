@@ -42,16 +42,6 @@ class Login {
                     default:
                         this.error.innerText = "Une erreur est survenue.";
                 }
-
-                /* if (response.status === 200) {
-                    const user = await response.json();
-                    const userId = user.userId;
-                    const userLoggedIn = JSON.stringify({id: userId, isEditModeDisplayed: true})
-                    sessionStorage.setItem('user_data', userLoggedIn);
-                    window.location.replace('index.html');
-                } else if (response.status === 404) {
-                    this.error.innerText = "Erreur dans l’identifiant ou le mot de passe";
-                } */
             } catch (e) {
                 this.error.innerText = "La connexion au serveur a échoué. Veuillez réessayer.";
                 console.log(e);
