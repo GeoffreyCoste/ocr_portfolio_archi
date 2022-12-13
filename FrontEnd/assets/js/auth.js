@@ -12,7 +12,6 @@ const validateAuth = () => {
 
     const portfolio = document.querySelector('#portfolio');
     const gallery = document.querySelector('#portfolio .gallery');
-    const editTopBar = document.querySelector('.edit-top-bar');
 
     if (data) {
         console.log('User logged in. Edit mode activated.');

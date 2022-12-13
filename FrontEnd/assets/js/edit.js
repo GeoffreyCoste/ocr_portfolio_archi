@@ -1,8 +1,6 @@
 // Edit.js
 
 import { createLayer } from './layer.js';
-import { makeElementTakeFullViewportWidth } from '../utils/makeElementTakeFullViewportWidth.js'
-
 
 // Top bar
 const createEditTopBarElement = () => {
