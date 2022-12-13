@@ -63,6 +63,9 @@ body {
 	display: flex;
 	justify-content: center;
 	align-items: center;
+	position: fixed;
+	top: 0;
+	left: 0;
 	color: #fff;
 	background-color: #000;
 }
@@ -73,6 +76,10 @@ body {
 
 .edit-top-bar p {
 	margin-right: 1.313em;
+}
+
+.edit-top-bar + header {
+	margin-top: 6rem;
 }
 
 .btn {
@@ -150,16 +157,6 @@ body {
 	color: #000000;
 }
 
-.btn--back {
-	opacity: 0;
-	cursor: default;
-}
-
-.btn--back.show {
-	opacity: 1;
-	cursor: pointer;
-}
-
 .btn--edit {
 	width: auto;
 	margin: 0;
@@ -197,7 +194,7 @@ body {
 
 .layer {
     width: 100vw;
-    /* height: 100vh; */
+    height: 100vh;
     /* position: absolute; */
     position: fixed;
 	top: 0;
@@ -210,6 +207,7 @@ body {
 
 .modal {
 	width: 630px;
+	min-height: 200px;
 	background-color: #ffffff;
 	border-radius: 10px;
 	position: fixed;
@@ -224,15 +222,27 @@ body {
 	padding: 2rem;
 }
 
+.modal__content.hidden {
+	display: none;
+}
+
 .modal__header {
 	display: flex;
 	flex-direction: column;
 	justify-content: flex-start;
+	position: relative;
 }
 
-.header__buttons {
-	display: flex;
-	justify-content: space-between;
+.modal__header .btn--back {
+	position: absolute;
+	top: 0;
+	left: 0;
+}
+
+.modal__header .btn--close {
+	position: absolute;
+	top: 0;
+	right: 0;
 }
 
 /* .header__buttons .fa-arrow-left-long {
@@ -246,9 +256,9 @@ body {
 	margin: 1rem 0 2.25rem 0;
 }
 
-.modal__body {
+/* .modal__body {
 	padding: 0 3rem;
-}
+} */
 
 header {
 	display: flex;
@@ -365,13 +375,31 @@ li:hover {
 }
 
 .gallery--edit {
+	max-height: 408px;
 	grid-template-columns: repeat(5, 1fr);
 	padding-bottom: 3rem;
 	border-bottom: 1px solid #B3B3B3;
+	overflow-y: auto;
 }
 
 .gallery--edit.hidden {
 	display: none;
+}
+
+.gallery--edit::-webkit-scrollbar-track {
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+	border-radius: 10px;
+	background-color: #F5F5F5;
+}
+.gallery--edit::-webkit-scrollbar {
+	width: 8px;
+	background-color: #F5F5F5;
+}
+
+.gallery--edit::-webkit-scrollbar-thumb {
+	border-radius: 10px;
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+	background-color: #555;
 }
 
 .gallery img {
@@ -420,7 +448,7 @@ li:hover {
 
 #contact form,
 #login form,
-.form--add-img {
+.form--add-work {
 	text-align: left;
 	margin-top:30px;
 	display: flex;
@@ -429,19 +457,19 @@ li:hover {
 
 #contact input,
 #login input,
-.form--add-img input,
-.form--add-img select {
+.form--add-work input,
+.form--add-work select {
 	height: 50px;
 	font-size: 1.2em;
 	border: none;
 	box-shadow: 0px 4px 14px rgba(0, 0, 0, 0.09);
 }
 
-.form--add-img.hidden {
+.form--add-work.hidden {
 	display: none;
 }
 
-.form--add-img .form__input {
+.form--add-work .form__input {
 	height: 169px;
 	background-color: #E8F1F6;
 	display: flex;
@@ -462,7 +490,7 @@ li:hover {
 	cursor: pointer;
 }
 
-.form__input #input__file {
+.form__input .input__file {
 	position: absolute;
 	opacity: 0;
 	z-index: -1;
@@ -479,6 +507,11 @@ li:hover {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+	cursor: default;
+}
+
+.file__preview.hidden {
+	display: none;
 }
 
 #contact label,
