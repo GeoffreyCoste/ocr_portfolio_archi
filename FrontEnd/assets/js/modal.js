@@ -20,8 +20,10 @@ const createModal = (el) => {
             </div>
             <div class="modal__body">
                 <div class="gallery gallery--edit"></div>
-                <button class="btn btn--add-image">Ajouter une photo</button>
-                <button class="btn btn--no-border btn--delete-all">Supprimer la galerie</button>
+                <div class="buttons__container">
+                    <button class="btn btn--add-image">Ajouter une photo</button>
+                    <button class="btn btn--no-border btn--delete-all">Supprimer la galerie</button>
+                </div>
             </div>
         </div>
         <div class="modal__content hidden">
@@ -230,6 +232,7 @@ const submitAddWorkForm = async (e) => {
         switch(status) {
             case 201:
                 toggleModalContent();
+                displayWorksEditGallery();
                 break;
             case 400:
                 error.innerText = "Echec de la connexion au serveur. Veuillez réessayer.";
