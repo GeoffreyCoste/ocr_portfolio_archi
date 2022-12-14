@@ -1,35 +1,39 @@
-// Filters.js
+/**************
+ * filters.js *
+ * ************/
 
-import { getWorks, displayWorksGallery } from './works.js';
-import { getNoDuplicateCategoriesArr } from './categories.js';
+import { getWorks, displayWorksGallery } from '../works/works.js';
+import { getNoDuplicateCategoriesArr } from '../categories/categories.js';
 
 
-// Menu
+// 1. Menu
+
+// create filter menu element
 const createFilterMenu = () => {
     const filterMenu =  document.createElement('div');
     filterMenu.classList.add('filters');
     return filterMenu;
 };
 
+// display filter menu element 
+// inside 'el' parent param and before 'node' child param
 const displayFilterMenu = (el, node) => {
     const menu = createFilterMenu();
     el.insertBefore(menu, node);
     displayFilterButtons(menu);
 };
 
+
+// remove filter menu
 const removeFilterMenu = () => {
     const menu = document.querySelector('.filters');
     menu.classList.add("hidden");
 };
 
-// Buttons
-const mapFilters = (filters) => {
-    const filterButtonsNodes = filters.map((filter) => {
-        return createFilterButtonElement(filter);
-    });
-    return filterButtonsNodes;
-};
 
+// 2. Buttons
+
+// create filter button element
 const createFilterButtonElement = (filter) => {
     const button = document.createElement('button');
     button.classList.add('btn', 'btn--filter');
@@ -38,6 +42,15 @@ const createFilterButtonElement = (filter) => {
     return button;
 };
 
+// map all filters params as filter button node
+const mapFilters = (filters) => {
+    const filterButtonsNodes = filters.map((filter) => {
+        return createFilterButtonElement(filter);
+    });
+    return filterButtonsNodes;
+};
+
+// display all filter button nodes inside 'el' param
 const displayFilterButtons = async (el) => {
     const data = getNoDuplicateCategoriesArr();
     const categories = await data;
@@ -49,6 +62,7 @@ const displayFilterButtons = async (el) => {
     handleFilters();
 }
 
+// manage works filter upon filter button click
 const handleFilters = () => {
     const btnFilters = Array.from(document.querySelectorAll('.btn--filter'));
     btnFilters[0].classList.add('active');
@@ -60,6 +74,7 @@ const handleFilters = () => {
     });
 };
 
+// filter works datas according to categories and active filter button
 const filterWorks = async (event) => {
     const data = getWorks();
     const works = await data;
@@ -72,6 +87,7 @@ const filterWorks = async (event) => {
     };
 }
 
+// switch active filter button
 const toggleActive = (btnFilters, event) => {
     let target = event.target;
     btnFilters.forEach(btn => {

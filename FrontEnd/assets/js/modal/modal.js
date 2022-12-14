@@ -1,13 +1,18 @@
-// Modal
+/***********
+ * modal.js *
+ * *********/
 
-import { getWorks, deleteWork } from './works.js';
-import { getCategories } from './categories.js';
-import { removeLayer } from "./layer.js";
+import { getWorks, deleteWork, addWork } from '../works/works.js';
+import { getCategories } from '../categories/categories.js';
+import { removeLayer } from "../layer/layer.js";
+
+
+// 1. modal
 
 let modal;
 
+// create modal element with toggling content blocks
 const createModal = (el) => {
-
     modal = document.createElement('div');
     modal.classList.add('modal');
     modal.innerHTML = `
@@ -63,55 +68,66 @@ const createModal = (el) => {
         </div>
     `
 
+    // insert modal inside 'el' param
     el.append(modal);
     displayWorksEditGallery();
 
+    // prevent modal click to remove layer and itself
     modal.addEventListener('click', (e) => {
         e.stopPropagation();
     });
 
+    // close modal
     const btnClose = document.querySelector('.btn--close');
     btnClose.addEventListener('click', () => {
         removeModal();
         removeLayer();
     });
 
+    // switch modal content from edit gallery to add img form
     const btnAddImage = document.querySelector('.btn--add-image');
     btnAddImage.addEventListener('click', (e) => {
         e.preventDefault();
         toggleModalContent();
     });
 
+    // switch back modal content from add img form to edit gallery
     const btnBack = document.querySelector('.btn--back');
     btnBack.addEventListener('click', (e) => {
         e.preventDefault();
         toggleModalContent();
     });
 
+    // manage preview of selected img to be added
     const inputFile = document.querySelector('.input__file');
     inputFile.addEventListener('change', (e) => {
         e.preventDefault();
         filePreview(e);
     });
 
+    // map categories datas into HTML option tags inserted inside input category select tag
     const inputCategory = document.querySelector('.input__category');
     displayOptions(inputCategory);
 
+    // upon add img form submit realize the add work request with formData 
+    // and pass errorElement to display hypothetic error
     const addWorkForm = document.querySelector('.form--add-work');
     addWorkForm.addEventListener('submit', (e) => {
         e.preventDefault();
-        e.stopPropagation();
-        console.log(e.target);
-        submitAddWorkForm(e);
+        const errorElement = document.querySelector('.modal__body .error-message');
+        const formData = new FormData(e.target);
+        addWork(formData, errorElement);
     });
 
     return modal;
 };
 
+// remove modal element
 const removeModal = () => {
     modal.remove();
 }
 
+// switch modal content between edit gallery and add img form
 const toggleModalContent = () => {
     const contents = Array.from(document.querySelectorAll('.modal__content'));
     contents.forEach((content) => {
@@ -123,6 +139,10 @@ const toggleModalContent = () => {
     });
 };
 
+
+// 2. edit gallery
+
+// create edit gallery with works datas and display
 const displayWorksEditGallery = async () => {
     const editGallery = document.querySelector('.gallery--edit');
     const data = getWorks();
@@ -161,12 +181,13 @@ const displayWorksEditGallery = async () => {
     return editGallery;
 }
 
-// Input[type="file"] handling
+// generate preview for file selected through input[type="file"]
 const filePreview = (e) => {
     const input = e.target;
     const file = input.files;
 
     if (file) {
+        // check file size does not exceed limit
         checkFile(file);
         const fileReader = new FileReader();
         const preview = document.querySelector('.file__preview');
@@ -180,7 +201,7 @@ const filePreview = (e) => {
     };
 };
 
-// Check file size
+// prevent file size to exceed limit
 const checkFile = (file) => {
     const error = document.querySelector('.error-message');
     if (file.size > 4194304) {
@@ -188,14 +209,10 @@ const checkFile = (file) => {
     }
 };
 
-// Option tags
-const mapOptions = (categories) => {
-    const optionsNodes = categories.map((category) => {
-        return createOptionElement(category);
-    });
-    return optionsNodes;
-};
 
+// 3. option tags
+
+// create HTML option tag element
 const createOptionElement = (category) => {
     const option = document.createElement('option');
     option.setAttribute('value', `${category.id}`);
@@ -203,6 +220,15 @@ const createOptionElement = (category) => {
     return option;
 };
 
+// map categories datas into HTML option tags
+const mapOptions = (categories) => {
+    const optionsNodes = categories.map((category) => {
+        return createOptionElement(category);
+    });
+    return optionsNodes;
+};
+
+// display option tag nodes inside 'el' param
 const displayOptions = async (el) => {
     const data = getCategories();
     const categories = await data;
@@ -210,47 +236,5 @@ const displayOptions = async (el) => {
     el.innerHTML = '';
     el.append(...optionsNodes);
 }
-
-// Add work form submit
-const submitAddWorkForm = async (e) => {
-    modal = document.querySelector('.modal');
-    const error = document.querySelector('.modal__body .error-message');
-
-    const formData = new FormData(e.target);
-    const userToken = sessionStorage.getItem("user_token");
-
-    try {
-        const response = await fetch('http://localhost:5678/api/works', {
-            method: 'POST',
-            body: formData, // using formData and letting browser fixing request headers
-            headers: {
-                /* 'Content-Type': 'multipart/form-data', */
-                'Authorization': `Bearer ${userToken}`
-            }
-        });
-        const status = response.status;
-        switch(status) {
-            case 201:
-                toggleModalContent();
-                displayWorksEditGallery();
-                break;
-            case 400:
-                error.innerText = "Echec de la connexion au serveur. Veuillez réessayer.";
-                break;
-            case 401:
-                error.innerText = "Echec de la connexion au serveur. Vous ne disposez pas des droits et autorisations requis.";
-                break;
-            case 500:
-                error.innerText = "Une erreur inattendue est survenue. Veuillez réessayer";
-                break;
-            default:
-                /* error.innerText = "Une erreur est survenue."; */
-                throw Error("Une erreur est survenue.");
-        }
-    } catch (e) {
-        console.log(e);
-        error.innerText = e;
-    };
-};
 
 export { createModal, removeModal, toggleModalContent, displayWorksEditGallery };

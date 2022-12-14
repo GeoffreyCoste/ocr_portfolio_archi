@@ -1,8 +1,10 @@
-// Works.js
+/************
+ * works.js *
+ * **********/
 
-import { toggleModalContent, displayWorksEditGallery } from "./modal.js";
+import { toggleModalContent, displayWorksEditGallery } from "../modal/modal.js";
 
-// Get works data
+// get works data
 const getWorks = async () => {
     try {
         const response = await fetch('http://localhost:5678/api/works');
@@ -13,11 +15,11 @@ const getWorks = async () => {
         const error = document.createElement('p');
         error.classList.add('error-message');
         error.innerText = 'Un problème est survenu lors du chargement.';
-        /* error.style.gridColumn = '2/3';
+        error.style.gridColumn = '2/3';
         error.style.gridRow = '1/2';
         error.innerText = 'Un problème est survenu lors du chargement.';
         gallery.innerHTML = '';
-        gallery.append(error); */
+        gallery.append(error);
     };
 };
 
@@ -28,6 +30,7 @@ const mapWorks = (works) => {
     return worksNodes;
 };
 
+// create work figure element
 const createWorkElement = (work) => {
     const figure = document.createElement('figure');
     figure.innerHTML = `
@@ -38,6 +41,7 @@ const createWorkElement = (work) => {
     return figure;
 };
 
+// display works figure nodes inside main gallery
 const displayWorksGallery = async (filteredWorks) => {
     const data = getWorks();
     const works = filteredWorks || await data;
@@ -49,7 +53,8 @@ const displayWorksGallery = async (filteredWorks) => {
     worksGallery.append(...worksNodes);
 };
 
-const addWork = async (formData, errorEl) => {
+// create new work through modal add img form
+const addWork = async (formData, errorElement) => {
     try {
         const userToken = sessionStorage.getItem("user_token");
         const response = await fetch('http://localhost:5678/api/works', {
@@ -59,24 +64,36 @@ const addWork = async (formData, errorEl) => {
                 'Authorization': `Bearer ${userToken}`
             }
         });
-        switch(response.status) {
-            case 200:
+        const status = response.status;
+        switch(status) {
+            case 201:
                 toggleModalContent();
+                displayWorksEditGallery();
                 break;
             case 400:
-                errorEl.innerText = "Echec de la connexion au serveur. Veuillez réessayer.";
+                // creating Error Object (i.e. { name: 'Error', message: 'String passed in the constructor' }) 
+                // to be captured by catch block below
+                throw new Error("Echec de la connexion au serveur. Veuillez réessayer.");
                 break;
             case 401:
-                errorEl.innerText = "Echec de la connexion au serveur. Vous ne disposez pas des droits et autorisations requis.";
+                // creating Error Object (i.e. { name: 'Error', message: 'String passed in the constructor' }) 
+                // to be captured by catch block below
+                throw new Error("Echec de la connexion au serveur. Vous ne disposez pas des droits et autorisations requis.");
                 break;
             case 500:
-                errorEl.innerText = "Une erreur inattendue est survenue. Veuillez réessayer";
+                // creating Error Object (i.e. { name: 'Error', message: 'String passed in the constructor' }) 
+                // to be captured by catch block below
+                throw new Error("Une erreur inattendue est survenue. Veuillez réessayer");
                 break;
             default:
-                errorEl.innerText = "Une erreur est survenue.";
+                // creating Error Object (i.e. { name: 'Error', message: 'String passed in the constructor' }) 
+                // to be captured by catch block below
+                throw new Error("Une erreur est survenue.");
         }
     } catch (e) {
         console.log(e);
+        // display message property of captured Error Object captured
+        errorElement.innerText = e.message;
     }
 };
 

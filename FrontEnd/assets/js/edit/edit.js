@@ -1,8 +1,12 @@
-// Edit.js
+/***********
+ * edit.js *
+ * *********/
 
-import { createLayer } from './layer.js';
+import { createLayer } from '../layer/layer.js';
 
-// Top bar
+// 1. Edit top bar
+
+// create edit top bar element
 const createEditTopBarElement = () => {
     const editTopBar = document.createElement("div");
     
@@ -17,6 +21,7 @@ const createEditTopBarElement = () => {
     return editTopBar;
 };
 
+// display edit top bar element before header
 const displayEditTopBar = () => {
     const body = document.querySelector("body");
     const header = document.querySelector("header");
@@ -25,7 +30,10 @@ const displayEditTopBar = () => {
     body.insertBefore(topbar, header);
 }
 
-// Buttons
+
+// 2. Buttons
+
+// create button element
 const createEditButtonElement = () => {
     const button = document.createElement("button");
     button.classList.add("btn", "btn--no-border", "btn--edit-field");
@@ -36,7 +44,8 @@ const createEditButtonElement = () => {
     return button;
 }
 
-const displayEditButtons = (field, position) => {
+// insert button element at a specified position and display modal on click
+const insertEditButtons = (field, position) => {
     const editButton = createEditButtonElement();
     field.insertAdjacentElement(position, editButton);
 
@@ -45,16 +54,17 @@ const displayEditButtons = (field, position) => {
     });
 }
 
-const handleEditElements = () => {
+// display all edit elements (i.e. edit top bar + field edit buttons)
+const displayEditElements = () => {
     const introSection = document.querySelector('#introduction');
     const introImg = introSection.firstElementChild;
     const introText = introSection.lastElementChild;
     const gallery = document.querySelector('#portfolio > .gallery');
 
     displayEditTopBar();
-    displayEditButtons(introImg, 'beforeend');
-    displayEditButtons(introText, 'afterbegin');
-    displayEditButtons(gallery, 'beforebegin');
+    insertEditButtons(introImg, 'beforeend');
+    insertEditButtons(introText, 'afterbegin');
+    insertEditButtons(gallery, 'beforebegin');
 };
 
-export { handleEditElements };
+export { displayEditElements };

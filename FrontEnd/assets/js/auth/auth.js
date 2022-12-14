@@ -1,29 +1,37 @@
-// Auth.js
+/***********
+ * auth.js *
+ * *********/
 
-import { handleEditElements } from './edit.js';
-import { displayFilterMenu } from './filters.js';
+import { displayEditElements } from '../edit/edit.js';
+import { displayFilterMenu } from '../filters/filters.js';
 
 
-let isEditModeDisplayed = false;
+/* let isEditModeDisplayed = false; */
 
 // check if sessionStorage contains logged in user data
 const validateAuth = () => {
-    const data = null || sessionStorage.getItem("user_data");
+    const userLoggedIn = null || sessionStorage.getItem("user_data");
 
     const portfolio = document.querySelector('#portfolio');
     const gallery = document.querySelector('#portfolio .gallery');
 
-    if (data) {
+    if (userLoggedIn) {
         console.log('User logged in. Edit mode activated.');
-        isEditModeDisplayed = !isEditModeDisplayed;
-        handleEditElements();
+        /* isEditModeDisplayed = !isEditModeDisplayed; */
+
+        // in case of user logged in, display edit top bar and field edit buttons
+        displayEditElements();
     } else {
         console.log('No user logged in. Edit mode disabled.');
-        isEditModeDisplayed = false;
+        /* isEditModeDisplayed = false; */
+
+        // in case no user is logged in, display filter menu
         displayFilterMenu(portfolio, gallery);
     };
 };
 
+// submit login form datas and create sessionStorage datas 
+// before replacing window location
 const login = () => {
     const error = document.querySelector('#login .error-message');
     let loginForm = document.querySelector('#login form');
@@ -53,23 +61,31 @@ const login = () => {
                         console.log(user);
                         const userToken = user.token;
                         const userId = user.userId;
-                        const userLoggedIn = JSON.stringify({id: userId, isEditModeDisplayed: true})
+                        const userLoggedIn = JSON.stringify({id: userId/* , isEditModeDisplayed: true */})
                         sessionStorage.setItem('user_data', userLoggedIn);
+                        // storing user token required for works delete requests
                         sessionStorage.setItem('user_token', userToken);
                         window.location.replace('index.html');
                         break;
                     case 401:
-                        error.innerText = "Erreur dans l’identifiant ou le mot de passe.";
+                        // creating Error Object (i.e. { name: 'Error', message: 'String passed in the constructor' }) 
+                        // to be captured by catch block below
+                        throw new Error("Erreur dans l’identifiant ou le mot de passe.");
                         break;
                     case 404:
-                        error.innerText = "Echec de la connexion. Vous ne disposez pas des droits et autorisations requis.";
+                        // creating Error Object (i.e. { name: 'Error', message: 'String passed in the constructor' }) 
+                        // to be captured by catch block below
+                        throw new Error("Echec de la connexion. Vous ne disposez pas des droits et autorisations requis.");
                         break;
                     default:
-                        error.innerText = "Une erreur est survenue.";
+                        // creating Error Object (i.e. { name: 'Error', message: 'String passed in the constructor' }) 
+                        // to be captured by catch block below
+                        throw new Error("Une erreur est survenue.");
                 }
             } catch (e) {
                 console.log(e);
-                error.innerText = "La connexion au serveur a échoué. Veuillez réessayer.";
+                // display message property of captured Error Object captured
+                error.innerText = e.message;
             }
         });
     }
