@@ -5,6 +5,7 @@
 import { getWorks, deleteWork, addWork } from '../works/works.js';
 import { getCategories } from '../categories/categories.js';
 import { removeLayer } from "../layer/layer.js";
+import { uploadFile, removeFile } from './fileInput.js';
 
 
 // 1. modal
@@ -24,6 +25,7 @@ const createModal = (el) => {
                 <h3 class="header__title">Galerie photo</h3>
             </div>
             <div class="modal__body">
+                <p class="error-message"></p>
                 <div class="gallery gallery--edit"></div>
                 <div class="buttons__container">
                     <button class="btn btn--add-image">Ajouter une photo</button>
@@ -41,10 +43,10 @@ const createModal = (el) => {
                 </button>
                 <h3 class="header__title">Ajout photo</h3>
             </div>
-            <div class="modal__body">
+            <div class="modal__body add__work">
                 <p class="error-message"></p>
                 <form action="#" method="post" class="form form--add-work">
-                    <div class="form__input">
+                    <div class="form__group group__input__file">
                         <i class="fa-regular fa-image"></i>
                         <label 
                             class="btn btn--no-border btn--select-img" 
@@ -54,14 +56,19 @@ const createModal = (el) => {
                         </label>
                         <input type="file" name="image" class="input__file" id="image" accept="image/png, image/jpg" required>
                         <span>jpg, png : 4Mo max</span>
-                        <img src="#" class="file__preview hidden" alt="Upload selected file preview">
+                        <div class="thumbnail"></div>
                     </div>
-                    <label for="title">Titre</label>
-                    <input type="text" name="title" id="input__title" required>
-                    <label for="category">Catégorie</label>
-                    <select name="category" class="input__category" id="category">
-                        <option value=""></option>
-                    </select>
+                    <div class="form__group">
+                        <label for="title">Titre</label>
+                        <input type="text" name="title" id="input__title" required>
+                    </div>
+                    <div class="form__group">
+                        <label for="category">Catégorie</label>
+                        <i class="fa-solid fa-chevron-down input__arrow__down"></i>
+                        <select name="category" class="input__category" id="category">
+                            <option value=""></option>
+                        </select>
+                    </div>
                     <input class="btn btn--submit btn--update-gallery" type="submit" value="Valider">
                 </form>
             </div>
@@ -70,6 +77,7 @@ const createModal = (el) => {
 
     // insert modal inside 'el' param
     el.append(modal);
+    document.body.classList.add('no-scroll');
     displayWorksEditGallery();
 
     // prevent modal click to remove layer and itself
@@ -78,10 +86,13 @@ const createModal = (el) => {
     });
 
     // close modal
-    const btnClose = document.querySelector('.btn--close');
-    btnClose.addEventListener('click', () => {
-        removeModal();
-        removeLayer();
+    const closeButtons = document.querySelectorAll('.btn--close');
+    closeButtons.forEach((btnClose) => {
+        btnClose.addEventListener('click', () => {
+            initForm(addWorkForm);
+            removeModal();
+            removeLayer();
+        });
     });
 
     // switch modal content from edit gallery to add img form
@@ -96,27 +107,41 @@ const createModal = (el) => {
     btnBack.addEventListener('click', (e) => {
         e.preventDefault();
         toggleModalContent();
+        /* initForm(); */ // no 'form' passed as parameter in order to keep eventual values inside input(s) (other than 'input[type="file"]') recorded
     });
 
     // manage preview of selected img to be added
     const inputFile = document.querySelector('.input__file');
     inputFile.addEventListener('change', (e) => {
         e.preventDefault();
-        filePreview(e);
+        uploadFile(e.target);
+        /* document.querySelector('.btn--select-img').classList.add('invisible'); */
     });
 
     // map categories datas into HTML option tags inserted inside input category select tag
     const inputCategory = document.querySelector('.input__category');
     displayOptions(inputCategory);
+    
 
+    const addWorkForm = document.querySelector('.form--add-work');
+    // init / reset add img form
+    const initForm = (form) => {
+        const error = document.querySelector('.modal__body.add__work .error-message');
+        error.classList.remove('show');
+        error.innerText = '';
+        inputFile.value = '';
+        form.reset();
+    };
     // upon add img form submit realize the add work request with formData 
     // and pass errorElement to display hypothetic error
-    const addWorkForm = document.querySelector('.form--add-work');
     addWorkForm.addEventListener('submit', (e) => {
         e.preventDefault();
-        const errorElement = document.querySelector('.modal__body .error-message');
+        const errorElement = document.querySelector('.modal__body.add__work .error-message');
         const formData = new FormData(e.target);
         addWork(formData, errorElement);
+        removeFile();
+        initForm(addWorkForm);
+        document.querySelector('.btn--select-img').classList.remove('invisible');
     });
 
     return modal;
@@ -125,6 +150,7 @@ const createModal = (el) => {
 // remove modal element
 const removeModal = () => {
     modal.remove();
+    document.body.classList.remove('no-scroll');
 }
 
 // switch modal content between edit gallery and add img form
@@ -170,11 +196,11 @@ const displayWorksEditGallery = async () => {
     editGallery.append(...worksNodes);
 
     const deleteButtons = Array.from(document.querySelectorAll('.btn--delete'));
-    console.log(deleteButtons);
     deleteButtons.forEach((btn) => {
+        const errorElement = document.querySelector('.modal__body .error-message');
         btn.addEventListener('click', async (e) => {
             e.preventDefault();
-            deleteWork(btn);
+            deleteWork(btn, errorElement);
         });
     });
 
@@ -182,9 +208,11 @@ const displayWorksEditGallery = async () => {
 }
 
 // generate preview for file selected through input[type="file"]
-const filePreview = (e) => {
+/* const filePreview = (e) => {
+    const label = document.querySelector('.btn--select-img');
     const input = e.target;
     const file = input.files;
+    console.log(file);
 
     if (file) {
         // check file size does not exceed limit
@@ -195,11 +223,16 @@ const filePreview = (e) => {
         fileReader.addEventListener('load', (e) => {
             preview.setAttribute('src', e.target.result);
             preview.classList.remove('hidden');
+            label.classList.add('hidden');
         });
 
         fileReader.readAsDataURL(file[0]);
+    } else {
+        preview.setAttribute('src', '#');
+        preview.classList.add('hidden');
+        label.classList.remove('hidden');
     };
-};
+}; */
 
 // prevent file size to exceed limit
 const checkFile = (file) => {
@@ -232,7 +265,12 @@ const mapOptions = (categories) => {
 const displayOptions = async (el) => {
     const data = getCategories();
     const categories = await data;
-    const optionsNodes = mapOptions(categories);
+    console.log(categories);
+    let defaultOption = { id: "", name: "" };
+    const options = [defaultOption, ...categories];
+    const optionsNodes = mapOptions(options);
+    
+    /* const optionsNodes = mapOptions(categories); */
     el.innerHTML = '';
     el.append(...optionsNodes);
 }

@@ -53,9 +53,14 @@ const createMobileNavbarCollapseElement = () => {
 
 // show / hide mobile menu + navbar upon click on hamburger mobile toggler button
 const toggleMobileNavbarCollapse = () => {
+    const editTopBar = document.querySelector('.edit-top-bar');
     const buttonToggler = document.querySelector('.btn--navbar-toggler');
     const navbarCollapse = document.querySelector('.navbar-collapse');
     if (!navbarCollapse.classList.contains('show')) {
+        // in case user is logged in and edit mode active, hiding edit top bar
+        if (editTopBar) {
+            editTopBar.classList.add('hidden');
+        }
         // show mobile menu + navbar
         navbarCollapse.classList.add('show');
         buttonToggler.innerHTML = '';
@@ -64,6 +69,10 @@ const toggleMobileNavbarCollapse = () => {
         // provide body from scrolling while mobile menu is opened
         document.body.classList.add('no-scroll');
     } else {
+        // in case user is logged in and edit mode active, replacing edit top bar
+        if (editTopBar) {
+            editTopBar.classList.remove('hidden');
+        }
         // hide mobile menu + navbar
         navbarCollapse.classList.remove('show');
         buttonToggler.innerHTML = '';

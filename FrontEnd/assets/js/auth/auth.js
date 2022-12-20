@@ -85,6 +85,7 @@ const login = () => {
             } catch (e) {
                 console.log(e);
                 // display message property of captured Error Object captured
+                error.classList.add('show');
                 error.innerText = e.message;
             }
         });

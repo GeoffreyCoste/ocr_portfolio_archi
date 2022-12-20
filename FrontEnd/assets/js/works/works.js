@@ -93,11 +93,12 @@ const addWork = async (formData, errorElement) => {
     } catch (e) {
         console.log(e);
         // display message property of captured Error Object captured
+        errorElement.classList.add('show');
         errorElement.innerText = e.message;
     }
 };
 
-const deleteWork = async (btn) => {
+const deleteWork = async (btn, errorElement) => {
     try {
         const userToken = sessionStorage.getItem("user_token");
         // With SQLite database deleting item will not result in indexes update and in making deleted item index available
@@ -115,11 +116,24 @@ const deleteWork = async (btn) => {
         switch(status) {
             case 204:
                 displayWorksEditGallery();
+                break;
+            case 401:
+                // creating Error Object (i.e. { name: 'Error', message: 'String passed in the constructor' }) 
+                // to be captured by catch block below
+                throw new Error("Echec de la connexion au serveur. Vous ne disposez pas des droits et autorisations requis.");
+                break;
+            case 500:
+                // creating Error Object (i.e. { name: 'Error', message: 'String passed in the constructor' }) 
+                // to be captured by catch block below
+                throw new Error("Une erreur inattendue est survenue. Veuillez réessayer");
+                break;
             default:
                 throw Error("Une erreur est survenue.");
         }
     } catch (e) {
-        console.log(err);
+        console.log(e);
+        errorElement.classList.add('show');
+        errorElement.innerText = e.message;
     };
 };
 
