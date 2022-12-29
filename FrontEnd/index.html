@@ -13,7 +13,9 @@
 </head>
 <body>
 <header>
-	<h1>Sophie Bluel <span>Architecte d'intérieur</span></h1>
+	<a class="logo" href="./index.html">
+		<h1>Sophie Bluel <span>Architecte d'intérieur</span></h1>
+	</a>
 	<nav>
 		<ul>
 			<li>
@@ -23,7 +25,7 @@
 				<a href="#contact">contact</a>
 			</li>
 			<li>
-				<a href="/FrontEnd/login.html">login</a>
+				<a href="./login.html">login</a>
 			</li>
 			<li><img src="./assets/icons/instagram.png" alt="Instagram"></li>
 		</ul>
@@ -31,10 +33,10 @@
 </header>
 <main>
 	<section id="introduction">
-		<figure class="target" data-insert-position="beforeend">
+		<figure>
 			<img src="./assets/images/sophie-bluel.png" alt="">
 		</figure>
-		<article class="target" data-insert-position="afterbegin">
+		<article>
 			<h2>Designer d'espace</h2>
 			<p>Je raconte votre histoire, je valorise vos idées. Je vous accompagne de la conception à la livraison finale du chantier.</p>
 			<p>Chaque projet sera étudié en commun, de façon à mettre en valeur les volumes, les matières et les couleurs dans le respect de l’esprit des lieux et le choix adapté des matériaux. Le suivi du chantier sera assuré dans le souci du détail, le respect du planning et du budget.</p>
@@ -42,7 +44,7 @@
 		</article>
 	</section>
 	<section id="portfolio">
-		<h2 class="target" data-insert-position="afterend">Mes projets</h2>
+		<h2>Mes projets</h2>
 		<div class="gallery">
 			<figure>
 				<img src="assets/images/abajour-tahina.png" alt="Abajour Tahina">
@@ -113,7 +115,6 @@
 	</nav>
 </footer>
 
-<script src="assets/js/auth.js"></script>
-<script src="assets/js/index.js"></script>
+<script type="module" src="assets/js/index.js"></script>
 </body>
 </html>
