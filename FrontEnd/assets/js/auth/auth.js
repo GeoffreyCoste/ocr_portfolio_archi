@@ -4,9 +4,8 @@
 
 import { displayEditElements } from '../edit/edit.js';
 import { displayFilterMenu } from '../filters/filters.js';
+import { displayError } from '../errors/errors.js';
 
-
-/* let isEditModeDisplayed = false; */
 
 // check if sessionStorage contains logged in user data
 const validateAuth = () => {
@@ -17,14 +16,12 @@ const validateAuth = () => {
 
     if (userLoggedIn) {
         console.log('User logged in. Edit mode activated.');
-        /* isEditModeDisplayed = !isEditModeDisplayed; */
-
+       
         // in case of user logged in, display edit top bar and field edit buttons
         displayEditElements();
     } else {
         console.log('No user logged in. Edit mode disabled.');
-        /* isEditModeDisplayed = false; */
-
+        
         // in case no user is logged in, display filter menu
         displayFilterMenu(portfolio, gallery);
     };
@@ -33,7 +30,6 @@ const validateAuth = () => {
 // submit login form datas and create sessionStorage datas 
 // before replacing window location
 const login = () => {
-    const error = document.querySelector('#login .error-message');
     let loginForm = document.querySelector('#login form');
 
     const validateOnSubmit = (loginForm) => {
@@ -83,10 +79,9 @@ const login = () => {
                         throw new Error("Une erreur est survenue.");
                 }
             } catch (e) {
-                console.log(e);
-                // display message property of captured Error Object captured
-                error.classList.add('show');
-                error.innerText = e.message;
+                console.error(e);
+                const loginSection = document.querySelector('#login');
+                displayError(e, loginSection, loginForm, false);
             }
         });
     }

@@ -3,6 +3,7 @@
  * **********/
 
 import { toggleModalContent, displayWorksEditGallery } from "../modal/modal.js";
+import { displayError } from "../errors/errors.js";
 
 // get works data
 const getWorks = async () => {
@@ -10,16 +11,14 @@ const getWorks = async () => {
         const response = await fetch('http://localhost:5678/api/works');
         const works = await response.json();
         return works;
-    } catch (err) {
-        console.log(err);
-        const error = document.createElement('p');
-        error.classList.add('error-message');
-        error.innerText = 'Un problème est survenu lors du chargement.';
-        error.style.gridColumn = '2/3';
-        error.style.gridRow = '1/2';
-        error.innerText = 'Un problème est survenu lors du chargement.';
-        gallery.innerHTML = '';
-        gallery.append(error);
+    } catch (e) {
+        console.error(e);
+        const error = {
+            message: 'Un problème est survenu lors du chargement.'
+        };
+        const portfolio = document.querySelector('#portfolio');
+        const gallery = document.querySelector('.gallery');
+        displayError(error, portfolio, gallery, true);
     };
 };
 
@@ -54,7 +53,7 @@ const displayWorksGallery = async (filteredWorks) => {
 };
 
 // create new work through modal add img form
-const addWork = async (formData, errorElement) => {
+const addWork = async (formData) => {
     try {
         const userToken = sessionStorage.getItem("user_token");
         const response = await fetch('http://localhost:5678/api/works', {
@@ -69,6 +68,7 @@ const addWork = async (formData, errorElement) => {
             case 201:
                 toggleModalContent();
                 displayWorksEditGallery();
+                displayWorksGallery();
                 break;
             case 400:
                 // creating Error Object (i.e. { name: 'Error', message: 'String passed in the constructor' }) 
@@ -91,14 +91,14 @@ const addWork = async (formData, errorElement) => {
                 throw new Error("Une erreur est survenue.");
         }
     } catch (e) {
-        console.log(e);
-        // display message property of captured Error Object captured
-        errorElement.classList.add('show');
-        errorElement.innerText = e.message;
+        console.error(e);
+        const modalBody = document.querySelector('.modal__body.add__work');
+        const addWorkForm = document.querySelector('.form--add-work');
+        displayError(e, modalBody, addWorkForm, false);
     }
 };
 
-const deleteWork = async (btn, errorElement) => {
+const deleteWork = async (btn) => {
     try {
         const userToken = sessionStorage.getItem("user_token");
         // With SQLite database deleting item will not result in indexes update and in making deleted item index available
@@ -112,10 +112,12 @@ const deleteWork = async (btn, errorElement) => {
                 }
             }
         );
+
         const status = response.status;
         switch(status) {
             case 204:
                 displayWorksEditGallery();
+                displayWorksGallery();
                 break;
             case 401:
                 // creating Error Object (i.e. { name: 'Error', message: 'String passed in the constructor' }) 
@@ -128,12 +130,14 @@ const deleteWork = async (btn, errorElement) => {
                 throw new Error("Une erreur inattendue est survenue. Veuillez réessayer");
                 break;
             default:
-                throw Error("Une erreur est survenue.");
+                throw new Error("Une erreur est survenue.");
         }
     } catch (e) {
         console.log(e);
-        errorElement.classList.add('show');
-        errorElement.innerText = e.message;
+        console.error(e);
+        const modalBody = document.querySelector('.modal__body');
+        const editGallery = document.querySelector('.gallery--edit');
+        displayError(e, modalBody, editGallery, false);
     };
 };
 

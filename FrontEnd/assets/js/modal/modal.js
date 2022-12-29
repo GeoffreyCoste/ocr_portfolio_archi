@@ -5,12 +5,13 @@
 import { getWorks, deleteWork, addWork } from '../works/works.js';
 import { getCategories } from '../categories/categories.js';
 import { removeLayer } from "../layer/layer.js";
-import { uploadFile, removeFile } from './fileInput.js';
-
-
-// 1. modal
+import { previewFile, removeChildren } from './fileInput.js';
+import { displayError } from '../errors/errors.js';
 
 let modal;
+let file;
+
+// 1. modal
 
 // create modal element with toggling content blocks
 const createModal = (el) => {
@@ -25,7 +26,12 @@ const createModal = (el) => {
                 <h3 class="header__title">Galerie photo</h3>
             </div>
             <div class="modal__body">
-                <p class="error-message"></p>
+                <div id="loading">
+                    <div class="loader loader--bar"></div>
+                    <div class="loader loader--bar"></div>
+                    <div class="loader loader--bar"></div>
+                    <span>Chargement ...</span>
+                </div>
                 <div class="gallery gallery--edit"></div>
                 <div class="buttons__container">
                     <button class="btn btn--add-image">Ajouter une photo</button>
@@ -44,7 +50,6 @@ const createModal = (el) => {
                 <h3 class="header__title">Ajout photo</h3>
             </div>
             <div class="modal__body add__work">
-                <p class="error-message"></p>
                 <form action="#" method="post" class="form form--add-work">
                     <div class="form__group group__input__file">
                         <i class="fa-regular fa-image"></i>
@@ -54,10 +59,10 @@ const createModal = (el) => {
                         >
                             + Ajouter photo
                         </label>
-                        <input type="file" name="image" class="input__file" id="image" accept="image/png, image/jpg" required>
+                        <input type="file" name="image" class="input__file" id="image" accept="image/png, image/jpeg" required>
                         <span>jpg, png : 4Mo max</span>
-                        <div class="thumbnail"></div>
                     </div>
+                    <div class="thumbnail"></div>
                     <div class="form__group">
                         <label for="title">Titre</label>
                         <input type="text" name="title" id="input__title" required>
@@ -65,7 +70,7 @@ const createModal = (el) => {
                     <div class="form__group">
                         <label for="category">Catégorie</label>
                         <i class="fa-solid fa-chevron-down input__arrow__down"></i>
-                        <select name="category" class="input__category" id="category">
+                        <select name="category" class="input__category" id="category" required>
                             <option value=""></option>
                         </select>
                     </div>
@@ -107,15 +112,44 @@ const createModal = (el) => {
     btnBack.addEventListener('click', (e) => {
         e.preventDefault();
         toggleModalContent();
-        /* initForm(); */ // no 'form' passed as parameter in order to keep eventual values inside input(s) (other than 'input[type="file"]') recorded
     });
 
     // manage preview of selected img to be added
     const inputFile = document.querySelector('.input__file');
-    inputFile.addEventListener('change', (e) => {
+    const inputFileParent = document.querySelector('.group__input__file');
+    const container = document.querySelector('.modal__body.add__work');
+    const form = document.querySelector('.form--add-work');
+    const thumbnail = document.querySelector('.thumbnail');
+    const btnSubmit = document.querySelector('.btn--submit.btn--update-gallery');
+    // check input[type="file"] change in order to display initial input / img preview or error message
+    inputFile.addEventListener("change", (e) => {
         e.preventDefault();
-        uploadFile(e.target);
-        /* document.querySelector('.btn--select-img').classList.add('invisible'); */
+        if (inputFile.files.length > 0) {
+            const fileSize = inputFile.files.item(0).size;
+            const fileMb = fileSize / 1024 ** 2;
+            // check selected file size
+            // display error and prevent submit if size exceeds limit
+            if (fileMb >= 4) {
+                inputFileParent.classList.remove('invisible'); // switch opacity of input parent to 1 to show all childs and no img preview due to file size exceed
+                removeChildren(thumbnail); // remove childs of thumbnail
+                let error = new Error('Le fichier excède la limite autorisée.'); // create custom error
+                displayError(error, container, form, false);
+                // submit button not available if file size not ok
+                btnSubmit.disabled = true;
+            } else {
+                let errorContainer = document.querySelector('.error__container');
+                if (errorContainer) {
+                    errorContainer.innerHTML = ''; // remove childs inside errorContainer
+                }
+                // submit button available if file size ok
+                btnSubmit.disabled = false;
+                inputFileParent.classList.add('invisible'); // switch opacity of input parent to 0 to hide all childs and only keep img preview visible, input label taking full preview size and available for click
+                file = inputFile.files.item(0);
+                const preview = previewFile(file); // generate img preview
+                console.log(preview);
+                removeChildren(thumbnail).append(preview); // remove childs of thumbnail
+            }
+        };
     });
 
     // map categories datas into HTML option tags inserted inside input category select tag
@@ -126,9 +160,6 @@ const createModal = (el) => {
     const addWorkForm = document.querySelector('.form--add-work');
     // init / reset add img form
     const initForm = (form) => {
-        const error = document.querySelector('.modal__body.add__work .error-message');
-        error.classList.remove('show');
-        error.innerText = '';
         inputFile.value = '';
         form.reset();
     };
@@ -136,12 +167,11 @@ const createModal = (el) => {
     // and pass errorElement to display hypothetic error
     addWorkForm.addEventListener('submit', (e) => {
         e.preventDefault();
-        const errorElement = document.querySelector('.modal__body.add__work .error-message');
         const formData = new FormData(e.target);
-        addWork(formData, errorElement);
-        removeFile();
+        addWork(formData);
+        inputFileParent.classList.remove('invisible');
+        removeChildren(thumbnail);
         initForm(addWorkForm);
-        document.querySelector('.btn--select-img').classList.remove('invisible');
     });
 
     return modal;
@@ -172,8 +202,13 @@ const toggleModalContent = () => {
 const displayWorksEditGallery = async () => {
     const editGallery = document.querySelector('.gallery--edit');
     const data = getWorks();
-    const works = await data;
+    const works = await data || [];
 
+    if (works.length > 0) {
+        const loading = document.querySelector('#loading');
+        loading.style.display = 'none';
+    };
+    
     const worksNodes = works.map((work) => {
         const figure = document.createElement('figure');
         figure.innerHTML = `
@@ -197,50 +232,14 @@ const displayWorksEditGallery = async () => {
 
     const deleteButtons = Array.from(document.querySelectorAll('.btn--delete'));
     deleteButtons.forEach((btn) => {
-        const errorElement = document.querySelector('.modal__body .error-message');
         btn.addEventListener('click', async (e) => {
             e.preventDefault();
-            deleteWork(btn, errorElement);
+            deleteWork(btn);
         });
     });
 
     return editGallery;
 }
-
-// generate preview for file selected through input[type="file"]
-/* const filePreview = (e) => {
-    const label = document.querySelector('.btn--select-img');
-    const input = e.target;
-    const file = input.files;
-    console.log(file);
-
-    if (file) {
-        // check file size does not exceed limit
-        checkFile(file);
-        const fileReader = new FileReader();
-        const preview = document.querySelector('.file__preview');
-
-        fileReader.addEventListener('load', (e) => {
-            preview.setAttribute('src', e.target.result);
-            preview.classList.remove('hidden');
-            label.classList.add('hidden');
-        });
-
-        fileReader.readAsDataURL(file[0]);
-    } else {
-        preview.setAttribute('src', '#');
-        preview.classList.add('hidden');
-        label.classList.remove('hidden');
-    };
-}; */
-
-// prevent file size to exceed limit
-const checkFile = (file) => {
-    const error = document.querySelector('.error-message');
-    if (file.size > 4194304) {
-        error.innerText = `Veuillez sélectionner un fichier dont la taille n'excède pas 4Mo.`
-    }
-};
 
 
 // 3. option tags
@@ -264,13 +263,12 @@ const mapOptions = (categories) => {
 // display option tag nodes inside 'el' param
 const displayOptions = async (el) => {
     const data = getCategories();
-    const categories = await data;
+    const categories = await data || []; // in case of no data receipt, empty array is sent and only empty default option displayed
     console.log(categories);
     let defaultOption = { id: "", name: "" };
     const options = [defaultOption, ...categories];
     const optionsNodes = mapOptions(options);
     
-    /* const optionsNodes = mapOptions(categories); */
     el.innerHTML = '';
     el.append(...optionsNodes);
 }

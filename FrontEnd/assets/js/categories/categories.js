@@ -10,14 +10,14 @@ const getCategories = async () => {
         const categories = await response.json();
         return categories;
     } catch (e) {
-        console.log(e);
+        console.error(e); // No further error management measure due to the fact that 'getNoDuplicateCategoriesArr()' returns empty array if data request status is not 200 range
     };
 };
 
 // map categories to only keep name property and remove duplicate if any
 const getNoDuplicateCategoriesArr = async () => {
     const data = getCategories();
-    const json = await data;
+    const json = await data || [];
     const nameArr = json.map(item => item.name);
     const categories = [...new Set(nameArr)];
 

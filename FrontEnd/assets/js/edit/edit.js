@@ -15,7 +15,7 @@ const createEditTopBarElement = () => {
     editTopBar.innerHTML = `
         <i class="fa-regular fa-pen-to-square"></i>
         <p>Mode édition</p>
-        <button class="btn btn--edit-validate btn--logout">publier les changements</button>
+        <button type="button" class="btn btn--edit-validate btn--logout">publier les changements</button>
     `;
 
     return editTopBar;
@@ -28,6 +28,14 @@ const displayEditTopBar = () => {
     const topbar = createEditTopBarElement();
 
     body.insertBefore(topbar, header);
+
+    const btnLogout = document.querySelector('.btn--logout');
+    console.log(btnLogout);
+    btnLogout.addEventListener('click', () => {
+        sessionStorage.removeItem('user_data');
+        sessionStorage.removeItem('user_token');
+        removeEditElements();
+    });
 }
 
 
@@ -67,4 +75,15 @@ const displayEditElements = () => {
     insertEditButtons(gallery, 'beforebegin');
 };
 
-export { displayEditElements };
+const removeEditElements = () => {
+    const editTopBar = document.querySelector('.edit-top-bar');
+    const editButtons = Array.from(document.querySelectorAll('.btn--edit-field'));
+
+    editButtons.forEach((btn) => {
+        btn.remove();
+    });
+
+    editTopBar.remove();
+}
+
+export { displayEditElements, removeEditElements };
