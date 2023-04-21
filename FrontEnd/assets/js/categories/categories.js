@@ -16,9 +16,9 @@ const getCategories = async () => {
 
 // map categories to only keep name property and remove duplicate if any
 const getNoDuplicateCategoriesArr = async () => {
-    const data = getCategories();
+    const data = getCategories(); // 'getWorks()' instead of 'getCategories()'
     const json = await data || [];
-    const nameArr = json.map(item => item.name);
+    const nameArr = json.map(item => item.name); // 'item.category.name' instead of 'item.name'
     const categories = [...new Set(nameArr)];
 
     return categories;

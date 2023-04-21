@@ -3,6 +3,7 @@
  * *********/
 
 import { createLayer } from '../layer/layer.js';
+import { validateAuth } from '../auth/auth.js';
 
 // 1. Edit top bar
 
@@ -35,6 +36,7 @@ const displayEditTopBar = () => {
         sessionStorage.removeItem('user_data');
         sessionStorage.removeItem('user_token');
         removeEditElements();
+        validateAuth();
     });
 }
 
